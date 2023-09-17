@@ -13,11 +13,11 @@ p_load(capn, R.oo, repmis, ggplot2)
 #capn documentation: https://cran.r-project.org/web/packages/capn/capn.pdf 
 #repmis documentation: https://cran.r-project.org/web/packages/repmis/index.html 
 
-rm(list=ls()) #clear workspace
+#rm(list=ls()) #clear workspace
 
 #get data set for the problem set from Github
-source_data("https://github.com/efenichel/capn_stuff/raw/master/my_gw_data.RData")
-                     
+#source_data("https://github.com/efenichel/capn_stuff/raw/master/my_gw_data.RData")
+
 #The elements of gw.data are
 #The parameters from the multinomial logit for crop shares, 
 #to know which is which see the labels on the additional csp.means data using the View(csp.means) command.
@@ -38,7 +38,7 @@ source_data("https://github.com/efenichel/capn_stuff/raw/master/my_gw_data.RData
 ##################################################################################################
 #additional modeling parameters
 dr <- 0.03 #discount rate
-recharge <- 1.25 #inches per year constant rate
+recharge <- 1.25-1.25 #inches per year constant rate
 
 #capN parameters
 order <- 10 # approximaton order
@@ -140,7 +140,8 @@ WwdDs1<-function(water,param){
   APprime1 <- DcropFwater(water,param) #derivative of the area planted function
   
   temp<-sum(APprime1[1:5]*Gamma1)+sum((2*APprime1[1:5]*AP1[1:5])*Gamma2)
-  Wwd*(beta+temp)
+  (Wwd(water+10^-9,param)-  Wwd(water,param))/10^-9  #Wwd*(beta+temp)
+ 
   
 }
 #####################################################################
@@ -178,7 +179,7 @@ ProfDs1 <- function(water,param){
   }
   
   temp<-c(as.numeric(prices[1:5,1]-costCropAcreX),0)
-  sum(APprime1pa[1:6]*(temp[1:6]))
+  (profit(water+10^-9,param)- profit(water,param))/10^-9 # sum(APprime1pa[1:6]*(temp[1:6]))
   
   
 }
@@ -229,14 +230,14 @@ waterSim <- as.data.frame(waterSim)
 ggplot() + 
   geom_line(data = waterSim, aes(x = stock, y = shadowp),
             color = 'blue') +
-            labs( 
-            x= "Stored groundwater",
-            y = "Shadow price")  +
-            theme(  #http://ggplot2.tidyverse.org/reference/theme.html
-              axis.line = element_line(color = "black"), 
-              panel.background = element_rect(fill = "transparent",colour = NA),
-              plot.background = element_rect(fill = "transparent",colour = NA)
-            )
+  labs( 
+    x= "Stored groundwater",
+    y = "Shadow price")  +
+  theme(  #http://ggplot2.tidyverse.org/reference/theme.html
+    axis.line = element_line(color = "black"), 
+    panel.background = element_rect(fill = "transparent",colour = NA),
+    plot.background = element_rect(fill = "transparent",colour = NA)
+  )
 cat("if everything runs well the next line should say 16.82325", "\n")
 cat("At 21.5 acre feet of water, the shadow price is" , psim(pC,21.5)$shadowp, "\n")
 
@@ -260,8 +261,7 @@ testme<-psim(pcoeff = pC,
              stock = c(18.5,21.5), 
              wval = c(profit(18.5,gw.data),profit(21.5, gw.data)),
              sdot = c(sdot(18.5, recharge, gw.data),sdot(21.5, recharge, gw.data))
-             )
+)
 testme
 
 rm(j, testme)
-
