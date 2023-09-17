@@ -140,8 +140,9 @@ WwdDs1<-function(water,param){
   APprime1 <- DcropFwater(water,param) #derivative of the area planted function
   
   temp<-sum(APprime1[1:5]*Gamma1)+sum((2*APprime1[1:5]*AP1[1:5])*Gamma2)
-  Wwd*(beta+temp)
-  
+  #Wwd*(beta+temp)
+  (Wwd(water+10^-9,param)- Wwd(water,param))/10^-9 
+
 }
 #####################################################################
 #profit function
@@ -156,8 +157,8 @@ profit <- function(water,param){
     AP[j]<-AP1[j]/sum(AP1)
   }
   temp<-c(as.numeric(prices[1:5,1]-costCropAcreX),0)
-  sum(AP[1:6]*(temp[1:6]))
-  
+  #sum(AP[1:6]*(temp[1:6]))
+  (profit(water+10^-9,param)- profit(water,param))/10^-9 
   
 }
 
